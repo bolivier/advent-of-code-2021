@@ -1,34 +1,22 @@
 (ns aoc.day-1
-  (:require [clojure.java.io :as io]))
-
-(defn read-integer-file-lines [path]
-  (->> "resources/day_1.input"
-       io/reader
-       line-seq
-       (map #(Integer/parseInt %))))
+  (:require [aoc.utils :refer [increasing? sum read-integer-file-lines]]))
 
 (defn solution-1
   "Given your input, find the number of times the depth measurement
   increasees"
-  []
-  (->> "resources/day_1.input"
-       read-integer-file-lines
-       (partition 2 1)
-       (filter (fn [[prev next]]
-                 (< prev next)))
-       count))
-
-(defn sum [coll]
-  (apply + coll))
-
-(defn solution-2 [input]
+  [input]
   (->> input
-       (partition 3 1)
-       (map sum)
        (partition 2 1)
-       (filter (fn [[prev next]]
-                 (< prev next)))
+       (filter #(apply increasing? %))
        count))
+
+(defn solution-2
+  "Use a 3 element sliding window instead of single elements to measure
+  incresae/decrease."
+  [input]
+  (let [sliding-windows (partition 3 1 input)
+        sliding-window-totals (map sum sliding-windows)]
+    (solution-1 sliding-window-totals)))
 
 (comment
   (def input [199

@@ -12,3 +12,9 @@
        io/reader
        line-seq
        (map #(Integer/parseInt %))))
+
+(defn parse-int [n]
+  (Integer/parseInt n))
+
+(defn zip [& colls]
+  (apply (partial map vector) colls))

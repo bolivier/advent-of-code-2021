@@ -62,54 +62,39 @@
 (defn bin-string [n]
   (Integer/toBinaryString n))
 
-(defn get-o2-rating []
-  (let [str-contents
-        #_(str/split-lines (str/trim file-contents))
-        (str/split-lines (slurp "resources/day_3.input"))
+(defn get-o2-rating [contenders bit-idx]
+  (let [checking-bit
+        (most-common-bit (mapv #(nth-bit % bit-idx) contenders)
+                         1)]
+    (if (= 1 (count contenders))
+      (first contenders)
+      (recur
+       (filter #(= checking-bit (nth-bit % bit-idx)) contenders)
+       (dec bit-idx)))))
 
-        max-bit           (-> str-contents first count dec)
-        diagnostic-report (map #(Long/parseLong % 2) str-contents)]
-    (for [i (range max-bit -1 -1)]
-      (most-common-bit (mapv #(nth-bit % i) diagnostic-report)
-                       1))
+(defn get-co2-rating [contenders bit-idx]
+  (let [checking-bit
+        (least-common-bit (mapv #(nth-bit % bit-idx) contenders)
+                          0)]
+    (if (= 1 (count contenders))
+      (first contenders)
+      (recur
+       (filter #(= checking-bit (nth-bit % bit-idx)) contenders)
+       (dec bit-idx)))))
 
-    (loop [contenders diagnostic-report
-           bit-idx    max-bit]
-      (let [checking-bit
-            (most-common-bit (mapv #(nth-bit % bit-idx) contenders)
-                             1)]
-        (if (= 1 (count contenders))
-          (first contenders)
-          (recur
-           (filter #(= checking-bit (nth-bit % bit-idx)) contenders)
-           (dec bit-idx)))))))
+(defn parse-binary-file-contents [file-contents]
+  (map
+   (fn [binary-line]
+     (Long/parseLong binary-line 2))
+   file-contents))
 
-(defn get-co2-rating []
-  (let [str-contents
-        #_(str/split-lines (str/trim file-contents))
-        (str/split-lines (slurp "resources/day_3.input"))
-
-        max-bit           (-> str-contents first count dec)
-        diagnostic-report (map #(Long/parseLong % 2) str-contents)]
-
-    (loop [contenders diagnostic-report
-           bit-idx    max-bit]
-
-      (let [checking-bit
-            (least-common-bit (mapv #(nth-bit % bit-idx) contenders)
-                              0)]
-        (if (= 1 (count contenders))
-          (first contenders)
-          (recur
-           (filter #(= checking-bit (nth-bit % bit-idx)) contenders)
-           (dec bit-idx)))))))
-
-
-(defn solution-2 []
-  (let [co2-rating (get-co2-rating)
-        o2-rating (get-o2-rating)]
-    (* co2-rating
-       o2-rating)))
+(let [file-contents (str/split-lines (slurp "resources/day_3.input"))
+      max-bit (-> file-contents first count)
+      diagnostic-report (parse-binary-file-contents file-contents)
+      co2-rating (get-co2-rating diagnostic-report max-bit)
+      o2-rating (get-o2-rating diagnostic-report max-bit)]
+  (* co2-rating
+     o2-rating))
 
 (comment
 
@@ -131,7 +116,7 @@
 
   10110
   (def diagnostic-report
-    (with-open [rdr (io/reader (char-array file-contents))]
+    (with-open [rdr (io/reader (char-array (str/trim file-contents)))]
       (read-binary-file-by-lines rdr)))
 
   (def diagnostic-report (read-binary-file-by-lines))

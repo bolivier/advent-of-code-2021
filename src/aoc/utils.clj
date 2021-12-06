@@ -18,3 +18,9 @@
 
 (defn zip [& colls]
   (apply (partial map vector) colls))
+
+(defn map-keys [f coll]
+  (into {}
+        (map (fn [[k v]]
+               [(f k) v])
+             coll)))

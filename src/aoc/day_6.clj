@@ -1,4 +1,5 @@
-(ns aoc.day-6)
+(ns aoc.day-6
+  (:require [aoc.utils :refer [map-keys]]))
 
 (defn parse [file-contents]
   (read-string (str "[" file-contents "]")))
@@ -35,12 +36,6 @@
   []
   (let [input (parse (slurp "resources/day_6.input"))]
     (count-after-n-days input 256)))
-
-(defn map-keys [f coll]
-  (into {}
-        (map (fn [[k v]]
-               [(f k) v])
-             coll)))
 
 (defn tick' [coll]
   (let [coll' (map-keys dec coll)

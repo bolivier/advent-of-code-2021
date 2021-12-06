@@ -36,6 +36,36 @@
   (let [input (parse (slurp "resources/day_6.input"))]
     (count-after-n-days input 256)))
 
+(defn map-keys [f coll]
+  (into {}
+        (map (fn [[k v]]
+               [(f k) v])
+             coll)))
+
+(defn tick' [coll]
+  (let [coll' (map-keys dec coll)
+        reproducing-fish (get coll' -1 0)]
+    (-> coll'
+        (dissoc -1)
+        (update 6 (fn [six]
+                    (+ reproducing-fish (or six 0))))
+        (update 8 (fn [eight]
+                    (+ reproducing-fish (or eight 0)))))))
+
+(defn count-days [freqs days]
+  (let [fish-seq (iterate tick' freqs)
+        day-of-fish (nth fish-seq days)]
+    (->> day-of-fish
+         vals
+         (apply +))))
+
+(defn solution-2 []
+  (let [input (slurp "resources/day_6.input")
+        freqs (frequencies (parse input))]
+    (count-days freqs 256)))
+;; 1574445493136
+
+
 (comment
   (def file-contents "3,4,3,1,2")
   (def input (read-string (str "[" file-contents "]")))
